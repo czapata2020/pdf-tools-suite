@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF Converter & Compressor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📄 PDF Tools Suite</h1>
+            <p class="subtitle">Convert, Compress, Clean, and Merge PDFs</p>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-button active" onclick="switchTab('convert', event)">
+                <span class="icon">📝</span> Convert to Word
+            </button>
+            <button class="tab-button" onclick="switchTab('compress', event)">
+                <span class="icon">📦</span> Compress PDF
+            </button>
+            <button class="tab-button" onclick="switchTab('metadata', event)">
+                <span class="icon">🔒</span> Clean Metadata
+            </button>
+            <button class="tab-button" onclick="switchTab('merge', event)">
+                <span class="icon">🔗</span> Merge PDFs
+            </button>
+        </div>
+
+        <!-- Convert Tab -->
+        <div id="convert-tab" class="tab-content active">
+            <div class="upload-area" id="convert-upload-area">
+                <div class="upload-icon">📄</div>
+                <h3>Drop PDF file here or click to browse</h3>
+                <p>Maximum file size: 100MB</p>
+                <input type="file" id="convert-file-input" accept=".pdf" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('convert-file-input').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <div id="convert-progress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="convert-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="convert-progress-text">Processing...</p>
+            </div>
+
+            <div id="convert-result" class="result-container" style="display: none;">
+                <div class="result-success">
+                    <div class="success-icon">✅</div>
+                    <h3>Conversion Successful!</h3>
+                    <div class="file-info">
+                        <p><strong>Original PDF:</strong> <span id="convert-original-size"></span> MB</p>
+                        <p><strong>Word Document:</strong> <span id="convert-converted-size"></span> MB</p>
+                    </div>
+                    <button class="btn btn-success" id="convert-download-btn">
+                        <span class="icon">⬇️</span> Download Word Document
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetConvert()">
+                        Convert Another File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compress Tab -->
+        <div id="compress-tab" class="tab-content">
+            <div class="quality-selector">
+                <label for="quality-select">Compression Quality:</label>
+                <select id="quality-select" class="quality-dropdown">
+                    <option value="low">Low Quality (Maximum Compression - 70-83%)</option>
+                    <option value="medium" selected>Medium Quality (Balanced - 40-60%)</option>
+                    <option value="high">High Quality (Minimal Compression - 20-40%)</option>
+                    <option value="maximum">Maximum Quality (Preserve Quality - 5-20%)</option>
+                </select>
+            </div>
+
+            <div class="upload-area" id="compress-upload-area">
+                <div class="upload-icon">📦</div>
+                <h3>Drop PDF file here or click to browse</h3>
+                <p>Maximum file size: 100MB</p>
+                <input type="file" id="compress-file-input" accept=".pdf" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('compress-file-input').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <div id="compress-progress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="compress-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="compress-progress-text">Compressing...</p>
+            </div>
+
+            <div id="compress-result" class="result-container" style="display: none;">
+                <div class="result-success">
+                    <div class="success-icon">✅</div>
+                    <h3>Compression Successful!</h3>
+                    <div class="file-info">
+                        <p><strong>Original Size:</strong> <span id="compress-original-size"></span> MB</p>
+                        <p><strong>Compressed Size:</strong> <span id="compress-compressed-size"></span> MB</p>
+                        <p class="reduction"><strong>Size Reduction:</strong> <span id="compress-reduction"></span>%</p>
+                        <p class="saved"><strong>Space Saved:</strong> <span id="compress-saved"></span> MB</p>
+                        <p class="method"><strong>Method:</strong> <span id="compress-method"></span></p>
+                    </div>
+                    <button class="btn btn-success" id="compress-download-btn">
+                        <span class="icon">⬇️</span> Download Compressed PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetCompress()">
+                        Compress Another File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Metadata Cleaning Tab -->
+        <div id="metadata-tab" class="tab-content">
+            <div class="metadata-options">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="keep-basic-info" checked>
+                    <span>Keep basic information (title and page count)</span>
+                </label>
+                <p class="info-text">🔒 Removes sensitive metadata like author, creation date, software used, etc.</p>
+            </div>
+
+            <div class="upload-area" id="metadata-upload-area">
+                <div class="upload-icon">🔒</div>
+                <h3>Drop PDF file here or click to browse</h3>
+                <p>Maximum file size: 100MB</p>
+                <input type="file" id="metadata-file-input" accept=".pdf" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('metadata-file-input').click()">
+                    Choose File
+                </button>
+            </div>
+
+            <div id="metadata-progress" class="progress-container" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="metadata-progress-fill"></div>
+                </div>
+                <p class="progress-text" id="metadata-progress-text">Cleaning metadata...</p>
+            </div>
+
+            <div id="metadata-result" class="result-container" style="display: none;">
+                <div class="result-success">
+                    <div class="success-icon">✅</div>
+                    <h3>Metadata Cleaned Successfully!</h3>
+                    <div class="file-info">
+                        <p><strong>Original Size:</strong> <span id="metadata-original-size"></span> MB</p>
+                        <p><strong>Cleaned Size:</strong> <span id="metadata-cleaned-size"></span> MB</p>
+                        <p class="reduction"><strong>Metadata Fields Removed:</strong> <span id="metadata-removed-count"></span></p>
+                    </div>
+                    <div class="metadata-details">
+                        <h4>Original Metadata:</h4>
+                        <div id="original-metadata-list" class="metadata-list"></div>
+                        <h4>After Cleaning:</h4>
+                        <div id="cleaned-metadata-list" class="metadata-list"></div>
+                    </div>
+                    <button class="btn btn-success" id="metadata-download-btn">
+                        <span class="icon">⬇️</span> Download Cleaned PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetMetadata()">
+                        Clean Another File
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Merge Tab -->
+        <div id="merge-tab" class="tab-content">
+            <div class="upload-area" id="merge-upload-area">
+                <div class="upload-icon">🔗</div>
+                <h2>Merge Multiple PDFs</h2>
+                <p>Select 2 or more PDF files to combine into one document</p>
+                <input type="file" id="merge-file-input" accept=".pdf" multiple style="display: none;">
+                <button class="btn btn-primary" id="merge-choose-btn">
+                    <span class="icon">📁</span> Choose Files
+                </button>
+                <p class="file-info">Supported format: PDF</p>
+            </div>
+
+            <div id="merge-file-list" class="file-list" style="display: none;">
+                <h3>Selected Files (Drag to reorder)</h3>
+                <div id="merge-files-container"></div>
+                <div class="button-group">
+                    <button class="btn btn-secondary" onclick="clearMergeFiles()">
+                        <span class="icon">🗑️</span> Clear All
+                    </button>
+                    <button class="btn btn-primary" onclick="startMerge()">
+                        <span class="icon">🔗</span> Merge PDFs
+                    </button>
+                </div>
+            </div>
+
+            <div id="merge-progress" class="progress-container" style="display: none;">
+                <div class="progress-icon">⏳</div>
+                <h3>Merging PDFs...</h3>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="merge-progress-fill"></div>
+                </div>
+                <p id="merge-progress-text">Processing...</p>
+            </div>
+
+            <div id="merge-result" class="result-container" style="display: none;">
+                <div class="success-icon">✅</div>
+                <h3>PDFs Merged Successfully!</h3>
+                <div class="result-info">
+                    <p><strong>Total Files Merged:</strong> <span id="merge-file-count">0</span></p>
+                    <p><strong>Total Pages:</strong> <span id="merge-total-pages">0</span></p>
+                    <p><strong>Output Size:</strong> <span id="merge-output-size">0 MB</span></p>
+                </div>
+                <div class="button-group">
+                    <button class="btn btn-primary" id="merge-download-btn">
+                        <span class="icon">⬇️</span> Download Merged PDF
+                    </button>
+                    <button class="btn btn-secondary" onclick="resetMerge()">
+                        <span class="icon">🔄</span> Merge More Files
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div id="error-message" class="error-container" style="display: none;">
+            <div class="error-icon">❌</div>
+            <h3>Error</h3>
+            <p id="error-text"></p>
+            <button class="btn btn-secondary" onclick="hideError()">Try Again</button>
+        </div>
+
+        <footer>
+            <p>Made with ❤️ by Bob | Powered by Ghostscript & pdf2docx</p>
+        </footer>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/app.js') }}"></script>
+</body>
+</html>

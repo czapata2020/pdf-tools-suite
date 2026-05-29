@@ -1,0 +1,19 @@
+# PDF to Word Converter Requirements
+
+# Core dependency for PDF to Word conversion
+pdf2docx==0.5.8
+
+# PDF Compression dependencies
+PyPDF2>=3.0.0
+Pillow>=10.0.0
+
+# Web application dependencies
+Flask>=3.0.0
+Werkzeug>=3.0.0
+gunicorn>=21.2.0
+
+# Additional dependencies (automatically installed with pdf2docx)
+# python-docx - for creating and updating Word documents
+# PyMuPDF (fitz) - for PDF processing
+# fonttools - for font handling
+# lxml - for XML processing
