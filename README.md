@@ -1,306 +1,427 @@
-# PDF to Word Converter & Compressor
+# PDF Tools Suite
 
-A simple and efficient Python tool to convert PDF files to Word documents (.docx format) and compress PDF files to reduce their size.
+A comprehensive web-based and command-line tool for PDF manipulation, conversion, and optimization. Convert PDFs to Word or Markdown, compress files, clean metadata, and merge multiple PDFs - all through an intuitive web interface or CLI.
 
-## Features
+## 🌟 Features
 
-### PDF to Word Conversion
-- ✅ Convert single PDF files to Word documents
+### 🌐 Web Interface
+- **Modern, responsive web UI** accessible via browser
+- **Drag-and-drop file upload** for easy file handling
+- **Real-time progress tracking** during operations
+- **Instant download** of processed files
+- **Multiple tools in one interface**
+
+### 📝 PDF to Word Conversion
+- ✅ Convert single PDF files to Word documents (.docx)
 - ✅ Batch convert multiple PDF files at once
 - ✅ Preserve text formatting, layout, and structure
-- ✅ Command-line interface for easy automation
-- ✅ Custom input/output directory support
+- ✅ Handle tables, images, and multi-column layouts
 - ✅ Progress tracking and error handling
 
-### PDF Compression
+### 📋 PDF & Word to Markdown Conversion (NEW!)
+- ✅ Convert PDF files to Markdown format
+- ✅ Convert Word documents (.docx, .doc) to Markdown
+- ✅ Preserve formatting (bold, italic, headings)
+- ✅ Convert tables to Markdown table syntax
+- ✅ Maintain document structure and hierarchy
+- ✅ Support for H1-H6 headings
+
+### 📦 PDF Compression
 - ✅ Reduce PDF file size with multiple quality levels
-- ✅ Compress single or multiple PDF files
 - ✅ Four compression quality presets (low, medium, high, maximum)
 - ✅ Detailed compression statistics and size reduction reports
+- ✅ Ghostscript integration for high-quality compression
 - ✅ Preserve PDF structure and readability
 
-## Requirements
+### 🔒 PDF Metadata Cleaning
+- ✅ Remove sensitive metadata from PDFs
+- ✅ Clean author, creation date, software information
+- ✅ Option to keep basic information (title, page count)
+- ✅ View metadata before cleaning
+- ✅ Protect privacy and security
 
-- Python 3.7 or higher
-- pip (Python package installer)
+### 🔗 PDF Merging
+- ✅ Combine multiple PDF files into one document
+- ✅ Drag-and-drop reordering of files
+- ✅ Preview file list before merging
+- ✅ Maintain quality and formatting
+- ✅ Support for unlimited number of files
 
-## Installation
+## 🚀 Quick Start
 
-1. **Clone or download this project**
+### Using Docker/Podman (Recommended)
 
-2. **Navigate to the project directory**
+1. **Clone the repository**
    ```bash
-   cd PDF_to_Word_Converter
+   git clone https://github.com/czapata2020/pdf-tools-suite.git
+   cd pdf-tools-suite
    ```
 
-3. **Install required dependencies**
+2. **Deploy with Podman**
+   ```bash
+   ./deploy-podman.sh
+   ```
+
+3. **Access the web interface**
+   ```
+   http://localhost:8080
+   ```
+
+### Manual Installation
+
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/czapata2020/pdf-tools-suite.git
+   cd pdf-tools-suite
+   ```
+
+2. **Install dependencies**
    ```bash
    pip install -r requirements.txt
    ```
 
-## Project Structure
+3. **Run the web application**
+   ```bash
+   python app.py
+   ```
+
+4. **Access the web interface**
+   ```
+   http://localhost:5000
+   ```
+
+## 📋 Requirements
+
+- Python 3.11 or higher
+- pip (Python package installer)
+- Ghostscript (optional, for better PDF compression)
+
+### Installing Ghostscript
+
+**macOS:**
+```bash
+brew install ghostscript
+```
+
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install ghostscript
+```
+
+**Windows:**
+Download from [Ghostscript official website](https://www.ghostscript.com/download/gsdnld.html)
+
+## 🗂️ Project Structure
 
 ```
-PDF_to_Word_Converter/
-├── main.py                 # Main entry point
-├── requirements.txt        # Python dependencies
-├── README.md              # This file
+PDF_Tools_Suite/
+├── app.py                      # Flask web application
+├── main.py                     # CLI entry point
+├── requirements.txt            # Python dependencies
+├── Dockerfile                  # Docker configuration
+├── deploy-podman.sh           # Podman deployment script
 ├── src/
-│   ├── pdf_converter.py   # Core conversion logic
-│   └── pdf_compressor.py  # PDF compression logic
-├── input/                 # Place your PDF files here
-└── output/                # Converted/compressed files will be saved here
+│   ├── pdf_converter.py       # PDF/Word to Word/Markdown conversion
+│   ├── pdf_compressor.py      # PDF compression logic
+│   ├── pdf_metadata_cleaner.py # Metadata removal
+│   └── pdf_merger.py          # PDF merging functionality
+├── static/
+│   ├── css/style.css          # Web interface styles
+│   └── js/app.js              # Frontend JavaScript
+├── templates/
+│   └── index.html             # Web interface HTML
+├── input/                     # Input directory for CLI
+├── output/                    # Output directory for CLI
+├── uploads/                   # Temporary uploads (web)
+└── outputs/                   # Processed files (web)
 ```
 
-## Usage
+## 🌐 Web Interface Usage
+
+### 1. Convert to Word
+- Click the "Convert to Word" tab
+- Upload a PDF file (drag-and-drop or click to browse)
+- Wait for conversion to complete
+- Download the converted .docx file
+
+### 2. Convert to Markdown
+- Click the "Convert to Markdown" tab
+- Upload a PDF or Word file (.pdf, .docx, .doc)
+- Wait for conversion to complete
+- Download the converted .md file
+
+### 3. Compress PDF
+- Click the "Compress PDF" tab
+- Select compression quality (low, medium, high, maximum)
+- Upload a PDF file
+- View compression statistics
+- Download the compressed PDF
+
+### 4. Clean Metadata
+- Click the "Clean Metadata" tab
+- Optionally view metadata before cleaning
+- Choose whether to keep basic information
+- Upload a PDF file
+- Download the cleaned PDF
+
+### 5. Merge PDFs
+- Click the "Merge PDFs" tab
+- Upload multiple PDF files
+- Reorder files by dragging or using arrow buttons
+- Click "Merge PDFs"
+- Download the merged PDF
+
+## 💻 Command-Line Usage
 
 ### PDF to Word Conversion
 
-#### Basic Usage - Convert All PDFs
-
-Place your PDF files in the `input/` folder and run:
-
 ```bash
+# Convert all PDFs in input folder
 python main.py
-```
 
-This will convert all PDF files in the `input/` directory and save the Word documents to the `output/` directory.
+# Convert a specific PDF
+python main.py --file document.pdf
 
-#### Convert a Single PDF File
-
-```bash
-python main.py --file path/to/your/document.pdf
-```
-
-#### Convert with Custom Output Path
-
-```bash
+# Convert with custom output
 python main.py --file input.pdf --output custom_name.docx
 ```
 
+### PDF to Markdown Conversion
+
+```bash
+# Convert PDF to Markdown
+python -c "from src.pdf_converter import PDFToWordConverter; \
+converter = PDFToWordConverter(); \
+converter.convert_to_markdown('input.pdf', 'output.md')"
+```
+
+### Word to Markdown Conversion
+
+```bash
+# Convert Word to Markdown
+python -c "from src.pdf_converter import PDFToWordConverter; \
+converter = PDFToWordConverter(); \
+converter.convert_word_to_markdown('document.docx', 'output.md')"
+```
+
 ### PDF Compression
 
-#### Compress All PDFs (Medium Quality)
-
 ```bash
+# Compress with medium quality
 python main.py --compress
-```
 
-#### Compress a Single PDF
+# Compress with specific quality
+python main.py --compress --file large.pdf --quality low
 
-```bash
-python main.py --compress --file large_document.pdf
-```
-
-#### Compress with Specific Quality Level
-
-```bash
-# Low quality (maximum compression)
-python main.py --compress --quality low
-
-# Medium quality (balanced)
-python main.py --compress --quality medium
-
-# High quality (minimal compression)
+# Compress all PDFs
 python main.py --compress --quality high
-
-# Maximum quality (preserve quality)
-python main.py --compress --quality maximum
 ```
 
-#### Compress with Custom Output Path
+## 🐳 Docker/Podman Deployment
+
+### Using Podman (Recommended)
 
 ```bash
-python main.py --compress --file document.pdf --output compressed_doc.pdf
+# Deploy the application
+./deploy-podman.sh
+
+# View logs
+podman logs -f pdf-converter-app
+
+# Stop the application
+podman stop pdf-converter-app
+
+# Restart the application
+podman restart pdf-converter-app
+
+# Remove the container
+podman rm -f pdf-converter-app
 ```
 
-### Use Custom Input/Output Directories
+### Using Docker
 
 ```bash
-python main.py --input-dir my_pdfs --output-dir my_docs
-python main.py --compress --input-dir my_pdfs --output-dir compressed_pdfs
+# Build the image
+docker build -t pdf-tools-suite .
+
+# Run the container
+docker run -d \
+  --name pdf-tools-app \
+  -p 8080:5000 \
+  -v $(pwd)/uploads:/app/uploads \
+  -v $(pwd)/outputs:/app/outputs \
+  pdf-tools-suite
+
+# Access at http://localhost:8080
 ```
 
-## Command-Line Options
+## 📊 API Endpoints
 
-| Option | Short | Description |
-|--------|-------|-------------|
-| `--compress` | `-c` | Enable PDF compression mode instead of conversion |
-| `--file` | `-f` | Path to a specific PDF file to convert or compress |
-| `--output` | `-o` | Custom output path for the converted/compressed file (use with --file) |
-| `--input-dir` | `-i` | Input directory containing PDF files (default: input) |
-| `--output-dir` | `-d` | Output directory for converted/compressed files (default: output) |
-| `--quality` | `-q` | Compression quality level: low, medium, high, maximum (default: medium) |
-| `--help` | `-h` | Show help message and exit |
+The web application provides the following REST API endpoints:
 
-## Compression Quality Levels
+- `POST /api/convert` - Convert PDF to Word
+- `POST /api/convert-to-markdown` - Convert PDF or Word to Markdown
+- `POST /api/compress` - Compress PDF
+- `POST /api/clean-metadata` - Remove PDF metadata
+- `POST /api/view-metadata` - View PDF metadata
+- `POST /api/merge` - Merge multiple PDFs
+- `POST /api/info` - Get PDF information
+- `GET /health` - Health check endpoint
 
-| Level | Description | Use Case |
-|-------|-------------|----------|
-| `low` | Maximum compression, smallest file size | Email attachments, web uploads |
-| `medium` | Balanced compression and quality | General purpose, archiving |
-| `high` | Minimal compression, better quality | Professional documents |
-| `maximum` | Preserve quality, minimal size reduction | High-quality documents |
+## 🔧 Configuration
 
-## Examples
+### Environment Variables
 
-### Conversion Examples
+- `SECRET_KEY` - Flask secret key (default: dev-secret-key-change-in-production)
+- `MAX_CONTENT_LENGTH` - Maximum upload size (default: 100MB)
 
-#### Example 1: Convert all PDFs in the input folder
-```bash
-python main.py
+### Port Configuration
+
+The application runs on:
+- **Web Interface**: Port 8080 (Podman) or 5000 (local)
+- **Internal**: Port 5000 (container)
+
+## 📝 Markdown Conversion Features
+
+### Supported Formatting
+
+**From PDF:**
+- Text extraction with layout preservation
+- Headings and structure
+- Tables
+- Lists
+- Basic formatting
+
+**From Word:**
+- Headings (H1-H6)
+- Bold text (`**bold**`)
+- Italic text (`*italic*`)
+- Bold + Italic (`***bold italic***`)
+- Tables with proper Markdown syntax
+- Paragraphs and line breaks
+
+### Example Output
+
+```markdown
+# Main Heading
+
+## Subheading
+
+This is a paragraph with **bold text** and *italic text*.
+
+### Table Example
+
+| Column 1 | Column 2 | Column 3 |
+| --- | --- | --- |
+| Data 1 | Data 2 | Data 3 |
+| Data 4 | Data 5 | Data 6 |
 ```
 
-#### Example 2: Convert a specific PDF
-```bash
-python main.py --file documents/report.pdf
-```
+## 🎯 Use Cases
 
-#### Example 3: Convert with custom output name
-```bash
-python main.py --file report.pdf --output final_report.docx
-```
+- **Document Conversion**: Convert PDFs to editable Word documents
+- **Content Migration**: Extract content from PDFs/Word to Markdown for websites
+- **File Optimization**: Reduce PDF sizes for email or web upload
+- **Privacy Protection**: Remove sensitive metadata from documents
+- **Document Management**: Merge multiple PDFs into single files
+- **Documentation**: Convert technical documents to Markdown format
 
-#### Example 4: Use custom directories
-```bash
-python main.py --input-dir ~/Documents/PDFs --output-dir ~/Documents/Word
-```
+## ⚙️ Technical Stack
 
-### Compression Examples
+- **Backend**: Flask (Python web framework)
+- **PDF Processing**: PyMuPDF, pdf2docx, PyPDF2
+- **Markdown Conversion**: pymupdf4llm, python-docx
+- **Compression**: Ghostscript, Pillow
+- **Frontend**: Vanilla JavaScript, HTML5, CSS3
+- **Deployment**: Gunicorn, Docker/Podman
+- **Server**: 4 Gunicorn workers with 300s timeout
 
-#### Example 5: Compress all PDFs with medium quality
-```bash
-python main.py --compress
-```
+## 🔒 Security Features
 
-#### Example 6: Compress a single PDF with low quality (maximum compression)
-```bash
-python main.py --compress --file large_file.pdf --quality low
-```
+- File size limits (100MB max)
+- Secure filename handling
+- Temporary file cleanup (1 hour)
+- Metadata removal capabilities
+- No data persistence (files auto-deleted)
 
-#### Example 7: Compress with custom output name
-```bash
-python main.py --compress --file document.pdf --output small_document.pdf
-```
-
-#### Example 8: Compress all PDFs in a custom directory
-```bash
-python main.py --compress --input-dir ~/Downloads --output-dir ~/Compressed --quality high
-```
-
-## Using as a Python Module
-
-You can also use the converter and compressor in your own Python scripts:
-
-### PDF to Word Conversion
-
-```python
-from src.pdf_converter import PDFToWordConverter
-
-# Initialize converter
-converter = PDFToWordConverter(input_dir="input", output_dir="output")
-
-# Convert a single file
-converter.convert_single_pdf("path/to/file.pdf")
-
-# Convert all PDFs in input directory
-results = converter.convert_all_pdfs()
-print(f"Converted {results['successful']} out of {results['total']} files")
-
-# Get PDF information
-info = converter.get_pdf_info("path/to/file.pdf")
-print(f"File size: {info['size_mb']} MB")
-```
-
-### PDF Compression
-
-```python
-from src.pdf_compressor import PDFCompressor
-
-# Initialize compressor
-compressor = PDFCompressor(input_dir="input", output_dir="output")
-
-# Compress a single file
-result = compressor.compress_pdf_basic(
-    "path/to/file.pdf",
-    compression_level="medium"
-)
-print(f"Size reduced by {result['reduction_percent']}%")
-
-# Compress all PDFs in input directory
-results = compressor.compress_all_pdfs(compression_level="high")
-print(f"Total reduction: {results['total_reduction_mb']} MB")
-print(f"Average reduction: {results['average_reduction_percent']}%")
-
-# Get compression information
-info = compressor.get_compression_info("path/to/file.pdf")
-print(f"File: {info['filename']}")
-print(f"Size: {info['size_mb']} MB")
-print(f"Pages: {info['page_count']}")
-```
-
-## Limitations
+## 🚨 Limitations
 
 ### PDF to Word Conversion
 - Complex PDF layouts may not convert perfectly
-- Scanned PDFs (images) will not be converted to editable text (OCR not included)
-- Some advanced PDF features (forms, annotations) may not be preserved
-- Large PDF files may take longer to convert
+- Scanned PDFs require OCR (not included)
+- Some advanced PDF features may not be preserved
+
+### Markdown Conversion
+- Complex formatting may be simplified
+- Images are not embedded in Markdown
+- Some PDF elements may not convert perfectly
 
 ### PDF Compression
-- Compression results vary depending on PDF content and structure
+- Results vary by PDF content
 - Already compressed PDFs may not reduce significantly
-- Some PDFs with complex graphics may have limited compression
 - Password-protected PDFs cannot be compressed
 
-## Troubleshooting
+## 🐛 Troubleshooting
 
-### Issue: "No module named 'pdf2docx'" or "No module named 'PyPDF2'"
-**Solution:** Install dependencies with `pip install -r requirements.txt`
+### Port Already in Use
+```bash
+# Kill process using port 8080
+lsof -ti:8080 | xargs kill -9
 
-### Issue: "No PDF files found"
-**Solution:** Make sure your PDF files are in the `input/` directory or specify the correct path with `--file`
+# Or use a different port
+podman run -p 9090:5000 ...
+```
 
-### Issue: Conversion fails for a specific PDF
-**Solution:** Some PDFs may have complex structures. Try:
-- Ensuring the PDF is not password-protected
-- Checking if the PDF is corrupted
-- Converting a simpler PDF first to verify the tool works
+### Podman Connection Issues
+```bash
+# Restart Podman machine
+podman machine stop
+podman machine start
+```
 
-### Issue: Compression doesn't reduce file size significantly
-**Solution:** Some PDFs are already optimized. Try:
-- Using a lower quality setting for more compression
-- Checking if the PDF contains mostly images (limited compression)
-- Verifying the PDF isn't already compressed
+### Module Not Found
+```bash
+# Reinstall dependencies
+pip install -r requirements.txt --force-reinstall
+```
 
-## Technical Details
+## 📚 Documentation
 
-### PDF to Word Conversion
-This tool uses the `pdf2docx` library, which:
-- Extracts text, images, and layout information from PDFs
-- Reconstructs the document structure in Word format
-- Preserves formatting like fonts, colors, and paragraph styles
-- Handles tables, images, and multi-column layouts
+- [Compression Guide](COMPRESSION_GUIDE.md) - Detailed compression options
+- [Deployment Guide](DEPLOYMENT.md) - Production deployment instructions
+- [Quick Start Guide](QUICK_START.md) - Get started quickly
 
-### PDF Compression
-This tool uses `PyPDF2` and `Pillow` libraries, which:
-- Compress PDF content streams
-- Optimize PDF structure
-- Remove redundant data
-- Maintain document integrity and readability
+## 🤝 Contributing
 
-## Contributing
+Contributions are welcome! Please feel free to submit a Pull Request.
 
-Feel free to submit issues, fork the repository, and create pull requests for any improvements.
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
 This project is open source and available for personal and commercial use.
 
-## Support
+## 🙏 Acknowledgments
 
-For issues or questions, please create an issue in the project repository.
+- pdf2docx - PDF to Word conversion
+- pymupdf4llm - PDF to Markdown conversion
+- PyMuPDF - PDF processing
+- Ghostscript - PDF compression
+- Flask - Web framework
+
+## 📧 Support
+
+For issues or questions:
+- Create an issue in the GitHub repository
+- Check existing documentation
+- Review troubleshooting section
 
 ---
 
-**Happy Converting! 📄 → 📝**
+**Made with ❤️ by Bob**
+
+**Happy Converting! 📄 → 📝 → 📋**
