@@ -35,12 +35,21 @@ ENV/
 .DS_Store
 
 # Project specific
-output/*.docx
-input/*.pdf
+output/*
+input/*
+uploads/*
+outputs/*
 *.log
+
+# Test files
+test_*.py
+quick_test_*.py
+*_test.md
 
 # Keep directory structure
 !input/.gitkeep
 !output/.gitkeep
+!uploads/.gitkeep
+!outputs/.gitkeep
 
 # Made with Bob
