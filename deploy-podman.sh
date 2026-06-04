@@ -36,7 +36,7 @@ podman rm pdf-converter-app 2>/dev/null
 echo "🚀 Starting container..."
 podman run -d \
     --name pdf-converter-app \
-    -p 5000:5000 \
+    -p 8080:5000 \
     -v $(pwd)/uploads:/app/uploads:Z \
     -v $(pwd)/outputs:/app/outputs:Z \
     -e SECRET_KEY=change-this-in-production \
@@ -55,7 +55,7 @@ echo "📊 Container Status:"
 podman ps | grep pdf-converter-app
 
 echo ""
-echo "🌐 Application is running at: http://localhost:5000"
+echo "🌐 Application is running at: http://localhost:8080"
 echo ""
 echo "📝 Useful commands:"
 echo "  - View logs:    podman logs -f pdf-converter-app"

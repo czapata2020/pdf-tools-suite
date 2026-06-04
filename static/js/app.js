@@ -168,6 +168,160 @@ function resetConvert() {
     convertFileInput.value = '';
 }
 
+// Markdown Tab Functions
+const markdownFileInput = document.getElementById('markdown-file-input');
+const markdownUploadArea = document.getElementById('markdown-upload-area');
+
+markdownUploadArea.addEventListener('click', (e) => {
+    // Ignore clicks from the button to prevent double-trigger
+    if (e.target.closest('button')) return;
+    
+    // Ignore clicks on the file input itself (from programmatic click())
+    if (e.target === markdownFileInput) {
+        console.log('[MARKDOWN] File input clicked (programmatic), skipping');
+        return;
+    }
+    
+    console.log('[MARKDOWN] Upload area clicked', {
+        target: e.target,
+        currentTarget: e.currentTarget,
+        timestamp: new Date().toISOString()
+    });
+    e.preventDefault();
+    e.stopPropagation();
+    markdownFileInput.click();
+});
+
+markdownUploadArea.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    markdownUploadArea.classList.add('dragover');
+});
+
+markdownUploadArea.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    markdownUploadArea.classList.remove('dragover');
+});
+
+markdownUploadArea.addEventListener('drop', (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    markdownUploadArea.classList.remove('dragover');
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        handleMarkdownFile(files[0]);
+    }
+});
+
+markdownFileInput.addEventListener('change', (e) => {
+    console.log('[MARKDOWN] File input change event', {
+        filesLength: e.target.files.length,
+        fileName: e.target.files[0]?.name,
+        timestamp: new Date().toISOString()
+    });
+    if (e.target.files.length > 0) {
+        const file = e.target.files[0];
+        console.log('[MARKDOWN] Processing file:', file.name, 'Size:', file.size);
+        // Reset the input value immediately to prevent re-triggering
+        e.target.value = '';
+        console.log('[MARKDOWN] Input value reset');
+        handleMarkdownFile(file);
+    }
+});
+
+function handleMarkdownFile(file) {
+    console.log('[MARKDOWN] handleMarkdownFile called', {
+        fileName: file.name,
+        fileSize: file.size,
+        fileType: file.type
+    });
+    
+    const fileName = file.name.toLowerCase();
+    const validExtensions = ['.pdf', '.docx', '.doc'];
+    const isValidFile = validExtensions.some(ext => fileName.endsWith(ext));
+    
+    if (!isValidFile) {
+        console.log('[MARKDOWN] ERROR: Invalid file type');
+        showError('Please select a PDF or Word file (.pdf, .docx, .doc)');
+        // Reset file input
+        markdownFileInput.value = '';
+        return;
+    }
+    
+    if (file.size > 100 * 1024 * 1024) {
+        console.log('[MARKDOWN] ERROR: File too large');
+        showError('File size must be less than 100MB');
+        // Reset file input
+        markdownFileInput.value = '';
+        return;
+    }
+    
+    console.log('[MARKDOWN] File validation passed, starting conversion');
+    convertToMarkdown(file);
+}
+
+function convertToMarkdown(file) {
+    const formData = new FormData();
+    formData.append('file', file);
+    
+    // Show progress
+    document.getElementById('markdown-upload-area').style.display = 'none';
+    document.getElementById('markdown-progress').style.display = 'block';
+    
+    // Animate progress bar
+    let progress = 0;
+    const progressFill = document.getElementById('markdown-progress-fill');
+    const progressInterval = setInterval(() => {
+        progress += 1;
+        if (progress <= 90) {
+            progressFill.style.width = progress + '%';
+        }
+    }, 100);
+    
+    fetch('/api/convert-to-markdown', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        clearInterval(progressInterval);
+        progressFill.style.width = '100%';
+        
+        setTimeout(() => {
+            if (data.success) {
+                showMarkdownResult(data);
+            } else {
+                showError(data.error || 'Conversion to Markdown failed');
+            }
+        }, 500);
+    })
+    .catch(error => {
+        clearInterval(progressInterval);
+        showError('Network error: ' + error.message);
+    });
+}
+
+function showMarkdownResult(data) {
+    document.getElementById('markdown-progress').style.display = 'none';
+    document.getElementById('markdown-result').style.display = 'block';
+    
+    document.getElementById('markdown-original-size').textContent = data.original_size;
+    document.getElementById('markdown-converted-size').textContent = data.converted_size;
+    
+    const downloadBtn = document.getElementById('markdown-download-btn');
+    downloadBtn.onclick = () => {
+        window.location.href = data.download_url;
+    };
+}
+
+function resetMarkdown() {
+    document.getElementById('markdown-result').style.display = 'none';
+    document.getElementById('markdown-upload-area').style.display = 'block';
+    document.getElementById('markdown-progress-fill').style.width = '0%';
+    markdownFileInput.value = '';
+}
+
 // Compress Tab Functions
 const compressFileInput = document.getElementById('compress-file-input');
 const compressUploadArea = document.getElementById('compress-upload-area');
@@ -763,6 +917,9 @@ function showError(message) {
     document.getElementById('convert-upload-area').style.display = 'none';
     document.getElementById('convert-progress').style.display = 'none';
     document.getElementById('convert-result').style.display = 'none';
+    document.getElementById('markdown-upload-area').style.display = 'none';
+    document.getElementById('markdown-progress').style.display = 'none';
+    document.getElementById('markdown-result').style.display = 'none';
     document.getElementById('compress-upload-area').style.display = 'none';
     document.getElementById('compress-progress').style.display = 'none';
     document.getElementById('compress-result').style.display = 'none';
@@ -785,6 +942,8 @@ function hideError() {
     // Show appropriate upload area based on active tab
     if (document.getElementById('convert-tab').classList.contains('active')) {
         document.getElementById('convert-upload-area').style.display = 'block';
+    } else if (document.getElementById('markdown-tab').classList.contains('active')) {
+        document.getElementById('markdown-upload-area').style.display = 'block';
     } else if (document.getElementById('compress-tab').classList.contains('active')) {
         document.getElementById('compress-upload-area').style.display = 'block';
     } else if (document.getElementById('metadata-tab').classList.contains('active')) {

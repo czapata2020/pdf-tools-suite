@@ -27,10 +27,15 @@ Path(app.config['OUTPUT_FOLDER']).mkdir(exist_ok=True)
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'pdf'}
+ALLOWED_MARKDOWN_EXTENSIONS = {'pdf', 'docx', 'doc'}
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+def allowed_markdown_file(filename):
+    """Check if file extension is allowed for markdown conversion"""
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_MARKDOWN_EXTENSIONS
 
 def cleanup_old_files():
     """Clean up files older than 1 hour"""
@@ -113,6 +118,68 @@ def convert_pdf():
             })
         else:
             return jsonify({'error': 'Conversion failed'}), 500
+            
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/convert-to-markdown', methods=['POST'])
+def convert_to_markdown():
+    """Convert PDF or Word document to Markdown"""
+    try:
+        if 'file' not in request.files:
+            return jsonify({'error': 'No file provided'}), 400
+        
+        file = request.files['file']
+        
+        if file.filename == '':
+            return jsonify({'error': 'No file selected'}), 400
+        
+        if not allowed_markdown_file(file.filename):
+            return jsonify({'error': 'Only PDF and Word files (.pdf, .docx, .doc) are allowed'}), 400
+        
+        # Generate unique filename
+        unique_id = str(uuid.uuid4())
+        filename = secure_filename(file.filename)
+        file_ext = Path(filename).suffix.lower()
+        input_path = Path(app.config['UPLOAD_FOLDER']) / f"{unique_id}_{filename}"
+        
+        # Save uploaded file
+        file.save(input_path)
+        
+        # Convert to Markdown
+        output_filename = f"{unique_id}_{Path(filename).stem}.md"
+        output_path = Path(app.config['OUTPUT_FOLDER']) / output_filename
+        
+        converter = PDFToWordConverter(
+            input_dir=app.config['UPLOAD_FOLDER'],
+            output_dir=app.config['OUTPUT_FOLDER']
+        )
+        
+        # Choose conversion method based on file type
+        if file_ext == '.pdf':
+            success = converter.convert_to_markdown(str(input_path), str(output_path))
+            file_type = 'PDF'
+        elif file_ext in ['.docx', '.doc']:
+            success = converter.convert_word_to_markdown(str(input_path), str(output_path))
+            file_type = 'Word'
+        else:
+            return jsonify({'error': 'Unsupported file type'}), 400
+        
+        if success:
+            # Get file info
+            original_size = input_path.stat().st_size / (1024 * 1024)  # MB
+            converted_size = output_path.stat().st_size / (1024 * 1024)  # MB
+            
+            return jsonify({
+                'success': True,
+                'download_url': url_for('download_file', filename=output_filename),
+                'original_size': round(original_size, 2),
+                'converted_size': round(converted_size, 2),
+                'filename': output_filename,
+                'file_type': file_type
+            })
+        else:
+            return jsonify({'error': f'Conversion from {file_type} to Markdown failed'}), 500
             
     except Exception as e:
         return jsonify({'error': str(e)}), 500

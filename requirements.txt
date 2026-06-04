@@ -3,6 +3,9 @@
 # Core dependency for PDF to Word conversion
 pdf2docx==0.5.8
 
+# PDF to Markdown conversion
+pymupdf4llm>=0.0.5
+
 # PDF Compression dependencies
 PyPDF2>=3.0.0
 Pillow>=10.0.0
