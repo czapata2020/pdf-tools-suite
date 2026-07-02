@@ -11,6 +11,7 @@ from pdf2docx import Converter
 from typing import Optional
 import pymupdf4llm
 from docx import Document
+from pptx import Presentation
 
 
 class PDFToWordConverter:
@@ -220,6 +221,128 @@ class PDFToWordConverter:
             return True
             
         except Exception as e:
+            print(f"✗ Error converting {docx_path} to Markdown: {str(e)}")
+            return False
+    
+    def convert_pptx_to_markdown(self, pptx_path: str, output_path: Optional[str] = None) -> bool:
+        """
+        Convert a PowerPoint presentation to Markdown
+        
+        Args:
+            pptx_path: Path to the PowerPoint file (.pptx)
+            output_path: Optional custom output path for the Markdown file
+            
+        Returns:
+            bool: True if conversion successful, False otherwise
+        """
+        try:
+            pptx_file = Path(pptx_path)
+            
+            if not pptx_file.exists():
+                print(f"Error: PowerPoint file not found: {pptx_path}")
+                return False
+            
+            if not pptx_file.suffix.lower() in ['.pptx', '.ppt']:
+                print(f"Error: File is not a PowerPoint presentation: {pptx_path}")
+                return False
+            
+            # Generate output path if not provided
+            if output_path is None:
+                output_filename = pptx_file.stem + '.md'
+                output_path = self.output_dir / output_filename
+            else:
+                output_path = Path(output_path)
+            
+            print(f"Converting PowerPoint to Markdown: {pptx_file.name}")
+            print(f"Output: {output_path}")
+            
+            # Load PowerPoint presentation
+            prs = Presentation(str(pptx_file))
+            
+            # Convert to Markdown
+            markdown_content = []
+            
+            for slide_num, slide in enumerate(prs.slides, start=1):
+                # Add slide header
+                markdown_content.append(f"# Slide {slide_num}")
+                markdown_content.append("")
+                
+                # Process all shapes in the slide
+                for shape in slide.shapes:
+                    # Handle text frames
+                    if hasattr(shape, "text") and shape.text.strip():
+                        text = shape.text.strip()
+                        
+                        # Check if it's a title
+                        if hasattr(shape, "is_placeholder") and shape.is_placeholder:
+                            placeholder = shape.placeholder_format
+                            if placeholder.type == 1:  # Title placeholder
+                                markdown_content.append(f"## {text}")
+                                markdown_content.append("")
+                                continue
+                        
+                        # Handle text frames with multiple paragraphs
+                        if hasattr(shape, "text_frame"):
+                            for paragraph in shape.text_frame.paragraphs:
+                                para_text = paragraph.text.strip()
+                                if not para_text:
+                                    continue
+                                
+                                # Check paragraph level for bullet points
+                                if paragraph.level > 0:
+                                    indent = "  " * paragraph.level
+                                    markdown_content.append(f"{indent}- {para_text}")
+                                else:
+                                    # Check for bold/italic formatting in runs
+                                    formatted_text = []
+                                    for run in paragraph.runs:
+                                        run_text = run.text
+                                        if run.font.bold and run.font.italic:
+                                            formatted_text.append(f"***{run_text}***")
+                                        elif run.font.bold:
+                                            formatted_text.append(f"**{run_text}**")
+                                        elif run.font.italic:
+                                            formatted_text.append(f"*{run_text}*")
+                                        else:
+                                            formatted_text.append(run_text)
+                                    
+                                    result_text = ''.join(formatted_text).strip()
+                                    if result_text:
+                                        markdown_content.append(result_text)
+                            
+                            markdown_content.append("")
+                    
+                    # Handle tables
+                    elif hasattr(shape, "table"):
+                        table = shape.table
+                        markdown_content.append("")
+                        
+                        # Header row
+                        header_cells = [cell.text.strip() for cell in table.rows[0].cells]
+                        markdown_content.append("| " + " | ".join(header_cells) + " |")
+                        markdown_content.append("| " + " | ".join(["---"] * len(header_cells)) + " |")
+                        
+                        # Data rows
+                        for row in table.rows[1:]:
+                            cells = [cell.text.strip() for cell in row.cells]
+                            markdown_content.append("| " + " | ".join(cells) + " |")
+                        
+                        markdown_content.append("")
+                
+                # Add separator between slides
+                markdown_content.append("---")
+                markdown_content.append("")
+            
+            # Write to file
+            with open(output_path, 'w', encoding='utf-8') as f:
+                f.write('\n'.join(markdown_content))
+            
+            print(f"✓ Successfully converted to Markdown: {pptx_file.name}")
+            return True
+            
+        except Exception as e:
+            print(f"✗ Error converting {pptx_path} to Markdown: {str(e)}")
+            return False
             print(f"✗ Error converting {docx_path} to Markdown: {str(e)}")
             return False
     

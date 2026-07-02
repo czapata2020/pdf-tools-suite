@@ -27,7 +27,7 @@ Path(app.config['OUTPUT_FOLDER']).mkdir(exist_ok=True)
 
 # Allowed file extensions
 ALLOWED_EXTENSIONS = {'pdf'}
-ALLOWED_MARKDOWN_EXTENSIONS = {'pdf', 'docx', 'doc'}
+ALLOWED_MARKDOWN_EXTENSIONS = {'pdf', 'docx', 'doc', 'pptx', 'ppt'}
 
 def allowed_file(filename):
     """Check if file extension is allowed"""
@@ -135,7 +135,7 @@ def convert_to_markdown():
             return jsonify({'error': 'No file selected'}), 400
         
         if not allowed_markdown_file(file.filename):
-            return jsonify({'error': 'Only PDF and Word files (.pdf, .docx, .doc) are allowed'}), 400
+            return jsonify({'error': 'Only PDF, Word, and PowerPoint files (.pdf, .docx, .doc, .pptx, .ppt) are allowed'}), 400
         
         # Generate unique filename
         unique_id = str(uuid.uuid4())
@@ -162,6 +162,9 @@ def convert_to_markdown():
         elif file_ext in ['.docx', '.doc']:
             success = converter.convert_word_to_markdown(str(input_path), str(output_path))
             file_type = 'Word'
+        elif file_ext in ['.pptx', '.ppt']:
+            success = converter.convert_pptx_to_markdown(str(input_path), str(output_path))
+            file_type = 'PowerPoint'
         else:
             return jsonify({'error': 'Unsupported file type'}), 400
         

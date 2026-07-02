@@ -15,6 +15,9 @@ Flask>=3.0.0
 Werkzeug>=3.0.0
 gunicorn>=21.2.0
 
+# PowerPoint to Markdown conversion
+python-pptx>=0.6.21
+
 # Additional dependencies (automatically installed with pdf2docx)
 # python-docx - for creating and updating Word documents
 # PyMuPDF (fitz) - for PDF processing
