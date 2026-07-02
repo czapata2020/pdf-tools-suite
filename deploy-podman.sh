@@ -27,10 +27,11 @@ fi
 
 echo "✅ Image built successfully!"
 
-# Stop and remove existing container if it exists
-echo "🧹 Cleaning up existing container..."
-podman stop pdf-converter-app 2>/dev/null
-podman rm pdf-converter-app 2>/dev/null
+# Stop and remove existing container if it exists (with force)
+echo "🧹 Stopping existing container (forced)..."
+podman stop -t 2 pdf-converter-app 2>/dev/null || true
+podman rm -f pdf-converter-app 2>/dev/null || true
+echo "✅ Cleanup complete!"
 
 # Run the container
 echo "🚀 Starting container..."
