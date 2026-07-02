@@ -238,12 +238,12 @@ function handleMarkdownFile(file) {
     });
     
     const fileName = file.name.toLowerCase();
-    const validExtensions = ['.pdf', '.docx', '.doc'];
+    const validExtensions = ['.pdf', '.docx', '.doc', '.pptx', '.ppt'];
     const isValidFile = validExtensions.some(ext => fileName.endsWith(ext));
     
     if (!isValidFile) {
         console.log('[MARKDOWN] ERROR: Invalid file type');
-        showError('Please select a PDF or Word file (.pdf, .docx, .doc)');
+        showError('Please select a PDF, Word, or PowerPoint file (.pdf, .docx, .doc, .pptx, .ppt)');
         // Reset file input
         markdownFileInput.value = '';
         return;
